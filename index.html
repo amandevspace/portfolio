@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aman — Developer</title>
+<meta name="description" content="Aman — CS undergrad building with the MERN stack and generative AI.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,380;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="noise" aria-hidden="true"></div>
+
+<!-- Brief load sequence — skipped instantly if the OS says reduce motion.
+     Not a spinner, just the wordmark settling before the page reveals. -->
+<div class="loader" id="loader" aria-hidden="true">
+  <span class="loader-mark">A.</span>
+</div>
+
+<!-- Soft radial glow that trails the pointer. Single div, no canvas,
+     blend-mode does the work. This is the one "wow" flourish. -->
+<div class="spotlight" id="spotlight" aria-hidden="true"></div>
+
+<header class="sidebar">
+  <div class="sidebar-top">
+    <a href="#top" class="mark magnetic" id="logo-mark">A.</a>
+    <p class="role-tag" id="location-tag"></p>
+  </div>
+
+  <nav class="side-nav" aria-label="Primary">
+    <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
+    <ul id="nav-list">
+      <li><a href="#about" data-nav>About</a></li>
+      <li><a href="#work" data-nav>Work</a></li>
+      <li><a href="#skills" data-nav>Skills</a></li>
+      <li><a href="#contact" data-nav>Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-bottom" id="sidebar-links"></div>
+</header>
+
+<main id="top">
+
+  <section class="hero" id="hero">
+    <p class="hero-kicker reveal-word">Hey, I'm</p>
+    <h1 class="hero-name" id="hero-name" aria-label="Aman"></h1>
+    <p class="hero-role reveal-word" id="hero-role"></p>
+    <p class="hero-intro reveal-word" id="hero-intro"></p>
+    <a href="#work" class="hero-cta magnetic reveal-word">See what I've built</a>
+  </section>
+
+  <section class="section about" id="about">
+    <h2 class="section-heading">How I got here</h2>
+    <div class="about-body" id="about-body"></div>
+  </section>
+
+  <section class="section work" id="work">
+    <h2 class="section-heading">Things I've built</h2>
+    <div class="projects" id="projects-list"></div>
+  </section>
+
+  <section class="section skills" id="skills">
+    <h2 class="section-heading">What I work with</h2>
+    <div class="skills-grid" id="skills-grid"></div>
+  </section>
+
+  <section class="section contact" id="contact">
+    <h2 class="section-heading contact-heading">Let's build something</h2>
+    <p class="contact-lead">
+      Open to internships and collaborations. The fastest way to reach me
+      is email — the form below just routes there.
+    </p>
+
+    <form class="contact-form" id="contact-form">
+      <div class="field">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="submit-btn magnetic">Send message</button>
+      <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
+    </form>
+
+    <div class="contact-links" id="contact-links"></div>
+  </section>
+
+  <footer class="footer">
+    <p>Handwritten HTML, CSS, and JS — no framework. Last touched <span id="footer-date"></span>.</p>
+    <p class="footer-kbd">Press <kbd>↓</kbd> / <kbd>↑</kbd> to move between sections.</p>
+  </footer>
+
+</main>
+
+<!-- Project detail modal — populated on open, one instance reused -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="modal">
+    <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+    <p class="modal-tag" id="modal-tag"></p>
+    <h3 id="modal-title"></h3>
+    <p class="modal-desc" id="modal-detail"></p>
+    <ul class="modal-highlights" id="modal-highlights"></ul>
+    <div class="modal-tags" id="modal-stack"></div>
+    <div class="modal-links" id="modal-links"></div>
+  </div>
+</div>
+
+<div class="cursor-dot" aria-hidden="true"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@latest/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@latest/dist/lenis.min.js"></script>
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
