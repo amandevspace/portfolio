@@ -45,53 +45,45 @@ body {
 }
 
 ::selection { background: var(--accent); color: #0a0a0a; }
-
 a { color: inherit; text-decoration: none; }
 
 .noise {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 999;
-  opacity: 0.035;
+  position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }
 
 /* =========================================================
-   LOADER
-   A wordmark that holds for a beat, then clears. Reduced-motion
-   users skip straight past it (handled in JS, not CSS, so there's
-   no flash of a frozen loader on those systems).
+   UNDERLINE-GROW — one hover pattern reused everywhere text
+   is a link, instead of an instant border toggle. transform
+   is animated (cheap), not width (expensive).
    ========================================================= */
-.loader {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
+.u-line { position: relative; display: inline-block; }
+.u-line::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -2px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s var(--ease);
 }
-
-.loader-mark {
-  font-family: var(--font-display);
-  font-size: 40px;
-  font-weight: 500;
-  color: var(--accent);
-  opacity: 0;
-}
+.u-line:hover::after,
+.u-line:focus-visible::after { transform: scaleX(1); }
 
 /* =========================================================
-   SPOTLIGHT — soft glow that trails the pointer, screen-blended
-   so it lifts the black rather than sitting on top of it.
+   LOADER
+   ========================================================= */
+.loader { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+.loader-mark { font-family: var(--font-display); font-size: 40px; font-weight: 500; color: var(--accent); opacity: 0; }
+
+/* =========================================================
+   SPOTLIGHT
    ========================================================= */
 .spotlight {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 480px;
-  height: 480px;
+  position: fixed; top: 0; left: 0;
+  width: 480px; height: 480px;
   border-radius: 50%;
   background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
   transform: translate(-50%, -50%);
@@ -99,114 +91,210 @@ a { color: inherit; text-decoration: none; }
   z-index: 1;
   mix-blend-mode: screen;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease, width 0.3s ease, height 0.3s ease;
   will-change: transform;
 }
-
 .spotlight.visible { opacity: 1; }
+.spotlight.tight { width: 260px; height: 260px; }
 
 /* =========================================================
    SIDEBAR
    ========================================================= */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: var(--sidebar-w);
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 40px 32px;
-  border-right: 1px solid var(--border);
-  z-index: 100;
-}
-
-.mark {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  display: inline-block;
-}
-
-.role-tag {
-  margin-top: 14px;
-  font-size: 13px;
-  color: var(--text-faint);
-  line-height: 1.5;
-}
+.sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 40px 32px; border-right: 1px solid var(--border); z-index: 100; }
+.mark { font-family: var(--font-display); font-size: 28px; font-weight: 500; letter-spacing: -0.01em; display: inline-block; }
+.role-tag { margin-top: 14px; font-size: 13px; color: var(--text-faint); line-height: 1.5; }
 
 .side-nav { position: relative; }
+.side-nav ul { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.side-nav a { font-size: 14.5px; color: var(--text-dim); position: relative; transition: color 0.2s ease; }
+.side-nav a:hover, .side-nav a.active { color: var(--text); }
 
-.side-nav ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.side-nav a {
-  font-size: 14.5px;
-  color: var(--text-dim);
-  position: relative;
-  transition: color 0.2s ease;
-}
-
-.side-nav a:hover,
-.side-nav a.active { color: var(--text); }
-
-/* Sliding indicator — a single element that animates its Y position
-   to sit next to whichever link is active, instead of four separate
-   pseudo-elements toggling on and off. */
 .nav-indicator {
-  position: absolute;
-  left: -18px;
-  width: 8px;
-  height: 1px;
-  background: var(--accent);
-  top: 7px;
-  opacity: 0;
-  transition: top 0.35s var(--ease), opacity 0.2s ease;
+  position: absolute; left: -18px; width: 8px; height: 1px; background: var(--accent);
+  top: 7px; opacity: 0; transition: top 0.4s var(--ease), opacity 0.2s ease, width 0.2s ease;
 }
-
 .nav-indicator.visible { opacity: 1; }
+.nav-indicator.preview { width: 14px; opacity: 0.5; }
 
+/* =========================================================
+   CONNECT BLOCK — the sidebar's Resume/GitHub/LinkedIn/LeetCode
+   row. Deliberately separated from nav (its own label + top
+   divider) and built as real button-like rows — bright icon and
+   label at rest, not faded text waiting to be hovered.
+   ========================================================= */
 .sidebar-bottom {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
 }
 
-.side-link {
-  font-size: 13px;
+.connect-label {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--text-faint);
-  width: fit-content;
-  border-bottom: 1px solid transparent;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  margin-bottom: 6px;
 }
 
-.side-link:hover { color: var(--accent); border-color: var(--accent-dim); }
+.connect-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s var(--ease), box-shadow 0.25s ease;
+}
+
+.connect-row:hover,
+.connect-row:focus-visible {
+  background: linear-gradient(135deg, var(--bg-elevated), var(--accent-glow));
+  border-color: var(--accent-dim);
+  box-shadow: 0 8px 22px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--accent-glow);
+  transform: translateX(2px);
+}
+
+.connect-row .link-label { font-size: 13.5px; font-weight: 500; }
+
+.connect-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--text);
+  transition: transform 0.3s var(--ease), color 0.2s ease;
+}
+.connect-row:hover .connect-icon { color: var(--accent); transform: scale(1.08); }
+
+.connect-row .ext-icon {
+  width: 11px; height: 11px;
+  margin-left: auto;
+  opacity: 0.55;
+  color: var(--text-dim);
+  transition: opacity 0.25s ease, transform 0.25s ease, color 0.2s ease;
+}
+.connect-row:hover .ext-icon { opacity: 1; color: var(--accent); transform: translate(2px, -2px); }
+
+/* =========================================================
+   ICON LINKS — used by the contact section further down the
+   page. Deliberately lighter-weight than the sidebar's connect
+   rows above (inline text links, not cards) — different context,
+   different treatment.
+   ========================================================= */
+.icon-link { display: inline-flex; align-items: center; gap: 9px; position: relative; }
+
+.link-icon { width: 15px; height: 15px; flex-shrink: 0; color: var(--text-faint); transition: transform 0.3s var(--ease), color 0.2s ease; }
+.icon-link:hover .link-icon { color: var(--accent); transform: scale(1.15) rotate(-8deg); }
+
+.ext-icon { width: 10px; height: 10px; opacity: 0.3; margin-left: 1px; transition: opacity 0.25s ease, transform 0.25s ease, color 0.2s ease; }
+.icon-link:hover .ext-icon { opacity: 0.9; color: var(--accent); transform: translate(2px, -2px); }
+
+.contact-links .icon-link { font-size: 13.5px; color: var(--text-faint); }
+.contact-links .icon-link:hover { color: var(--text); }
+
+/* Lightweight CSS-only tooltip — no JS needed to show it. */
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  font-size: 11px;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 150;
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+/* =========================================================
+   BACK TO TOP / SCROLL PROGRESS
+   ========================================================= */
+.back-to-top {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 40px; height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 200;
+  opacity: 0;
+  transform: translateY(8px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s var(--ease);
+}
+.back-to-top.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+
+#progress-ring { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ring-track { fill: var(--bg-card); stroke: var(--border); stroke-width: 1.5; }
+.ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 106.8;
+  stroke-dashoffset: 106.8;
+  transition: stroke-dashoffset 0.1s linear;
+}
+.back-to-top-arrow {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text-dim);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.back-to-top:hover .back-to-top-arrow { color: var(--accent); transform: translateY(-2px); }
 
 /* =========================================================
    MAIN
    ========================================================= */
 main { margin-left: var(--sidebar-w); max-width: 760px; position: relative; z-index: 2; }
-
 .section { padding: 120px var(--content-pad) 0; }
-
-.section-heading {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(26px, 3vw, 32px);
-  margin-bottom: 40px;
-  letter-spacing: -0.01em;
-}
+.section-heading { font-family: var(--font-display); font-weight: 500; font-size: clamp(26px, 3vw, 32px); margin-bottom: 40px; letter-spacing: -0.01em; }
 
 /* =========================================================
    HERO
    ========================================================= */
-.hero { padding: 96px var(--content-pad) 88px; }
+.hero {
+  padding: 96px var(--content-pad) 88px;
+  position: relative;
+}
+
+/* A slow, near-static gradient wash behind the hero text —
+   two soft radial fields that drift very gradually. This is
+   the "alive background" without a particle system to manage. */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -10%; left: -10%;
+  width: 70%; height: 90%;
+  background:
+    radial-gradient(circle at 30% 30%, var(--accent-glow), transparent 55%),
+    radial-gradient(circle at 70% 60%, rgba(201, 168, 117, 0.06), transparent 50%);
+  z-index: -1;
+  animation: drift 22s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(3%, 4%) scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before { animation: none; }
+}
 
 .hero-kicker { font-size: 15px; color: var(--text-dim); margin-bottom: 4px; }
 
@@ -216,19 +304,12 @@ main { margin-left: var(--sidebar-w); max-width: 760px; position: relative; z-in
   font-size: clamp(56px, 9vw, 96px);
   line-height: 1;
   letter-spacing: -0.02em;
+  cursor: default;
 }
-
 .hero-name .char { display: inline-block; }
 .hero-name .dot { color: var(--accent); }
 
-.hero-role {
-  margin-top: 24px;
-  font-size: clamp(17px, 2vw, 20px);
-  color: var(--text-dim);
-  max-width: 46ch;
-  line-height: 1.55;
-}
-
+.hero-role { margin-top: 24px; font-size: clamp(17px, 2vw, 20px); color: var(--text-dim); max-width: 46ch; line-height: 1.55; }
 .hero-intro { margin-top: 22px; max-width: 58ch; color: var(--text); font-size: 15.5px; }
 
 .hero-cta {
@@ -236,160 +317,260 @@ main { margin-left: var(--sidebar-w); max-width: 760px; position: relative; z-in
   margin-top: 40px;
   font-size: 14px;
   padding-bottom: 4px;
-  border-bottom: 1px solid var(--accent-dim);
-  transition: border-color 0.2s ease;
+  color: var(--accent-dim);
+  transition: color 0.2s ease;
 }
-
-.hero-cta:hover { border-color: var(--accent); }
-
-/* Elements marked for the load-in stagger start hidden;
-   JS reveals them in sequence, once, on page load. */
-.reveal-word { opacity: 0; transform: translateY(10px); }
+.hero-cta:hover { color: var(--accent); }
 
 /* =========================================================
-   ABOUT
+   ABOUT — a vertical timeline, not a paragraph block. The rail
+   fill is functional: it tracks actual scroll progress through
+   the section, not decoration. Each step activates (node fills,
+   title brightens) as it becomes the one being read, so scrolling
+   reads as moving through checkpoints rather than a wall of text.
    ========================================================= */
-.about-body p { max-width: 62ch; color: var(--text-dim); margin-bottom: 18px; font-size: 15.5px; }
-.about-body p:last-child { margin-bottom: 0; }
+.journey { position: relative; padding-left: 44px; }
+
+.journey-rail {
+  position: absolute;
+  left: 13px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--border);
+}
+
+.journey-rail-fill {
+  position: absolute;
+  inset: 0;
+  width: 1px;
+  background: linear-gradient(var(--accent), var(--accent-dim));
+  transform: scaleY(0);
+  transform-origin: top;
+}
+
+.journey-step {
+  position: relative;
+  padding-bottom: 56px;
+}
+.journey-step:last-child { padding-bottom: 0; }
+
+/* Opacity transition only turns on after THIS step's own GSAP
+   entrance tween has completed (script.js adds .revealed in that
+   tween's onComplete) — same reasoning as the rest of the site:
+   never let a CSS transition and a GSAP tween drive the same
+   property on the same element at the same time. */
+.journey-step.revealed { transition: opacity 0.4s ease; }
+.journey.hovering .journey-step.revealed:not(:hover) { opacity: 0.5; }
+
+.journey-node {
+  position: absolute;
+  left: -44px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+}
+
+.journey-step.active .journey-node {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow), 0 0 16px rgba(201, 168, 117, 0.35);
+}
+
+.journey-step:hover .journey-node { transform: scale(1.25); }
+
+.journey-index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  transition: color 0.4s ease;
+}
+.journey-step.active .journey-index { color: var(--accent); }
+
+.journey-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: -0.01em;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  transition: color 0.4s ease;
+}
+.journey-step.active .journey-title { color: var(--text); }
+
+.journey-body {
+  max-width: 58ch;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--text-dim);
+}
+
+/* The specific phrases worth pausing on — a soft glow only on
+   hover keeps it a genuine micro-interaction rather than a
+   permanently-lit block of text competing with everything else. */
+.key-phrase {
+  color: var(--text);
+  font-weight: 500;
+  border-bottom: 1px dotted var(--text-faint);
+  padding-bottom: 1px;
+  transition: color 0.25s ease, text-shadow 0.25s ease, border-color 0.25s ease;
+  cursor: default;
+}
+.key-phrase:hover {
+  color: #fff;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.4);
+  border-color: var(--accent);
+}
+
+@media (max-width: 860px) {
+  .journey { padding-left: 32px; }
+  .journey-rail { left: 9px; }
+  .journey-node { left: -32px; }
+  .journey-title { font-size: 21px; }
+}
 
 /* =========================================================
    PROJECTS
    ========================================================= */
+/* The heading pins in place while the project list scrolls past
+   beneath it — a small taste of a sticky, progressively-revealed
+   section without turning the whole page into a scroll-jack. */
+.work .section-heading {
+  position: sticky;
+  top: 32px;
+  z-index: 3;
+  background: linear-gradient(var(--bg) 70%, transparent);
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+}
+
 .projects { display: flex; flex-direction: column; gap: 4px; }
 
 .project {
   padding: 28px 0;
   border-top: 1px solid var(--border);
   cursor: pointer;
-  transition: transform 0.15s ease, padding-left 0.25s var(--ease);
+  transition: transform 0.15s ease, padding-left 0.25s var(--ease), border-color 0.25s ease;
   will-change: transform;
+  position: relative;
 }
-
 .project:first-child { border-top: none; padding-top: 0; }
 .project.offset { margin-left: clamp(0px, 6vw, 56px); }
-
 .project:hover { padding-left: 10px; }
 
 .project-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-
-.project-head h3 {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 21px;
-  letter-spacing: -0.01em;
-}
-
-.project-tag-label {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--accent-dim);
-  transition: color 0.2s ease;
-}
-
+.project-head h3 { font-family: var(--font-display); font-weight: 500; font-size: 21px; letter-spacing: -0.01em; }
+.project-tag-label { font-family: var(--font-mono); font-size: 11px; color: var(--accent-dim); transition: color 0.2s ease; }
 .project:hover .project-tag-label { color: var(--accent); }
 
 .project-links { display: flex; gap: 14px; font-size: 13px; color: var(--text-faint); }
-
-.project-links a { border-bottom: 1px solid transparent; transition: color 0.2s ease, border-color 0.2s ease; }
-.project-links a:hover { color: var(--accent); border-color: var(--accent-dim); }
+.project-links a:hover { color: var(--accent); }
 
 .project-desc { margin-top: 12px; max-width: 58ch; color: var(--text-dim); font-size: 14.5px; }
 
 .project-tags { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
-
 .project-tags span {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-faint);
-  border: 1px solid var(--border);
-  padding: 4px 9px;
-  border-radius: 3px;
+  font-family: var(--font-mono); font-size: 11.5px; color: var(--text-faint);
+  border: 1px solid var(--border); padding: 4px 9px; border-radius: 3px;
   transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition-delay: calc(var(--i, 0) * 0.03s);
 }
+.project:hover .project-tags span { border-color: var(--accent-dim); transform: translateY(-2px); }
 
-.project:hover .project-tags span { border-color: var(--accent-dim); }
-
-/* Staggered tag pop on hover — each tag lifts slightly, offset by
-   its position, instead of the whole block moving as one unit. */
-.project:hover .project-tags span:nth-child(1) { transform: translateY(-2px); transition-delay: 0s; }
-.project:hover .project-tags span:nth-child(2) { transform: translateY(-2px); transition-delay: 0.03s; }
-.project:hover .project-tags span:nth-child(3) { transform: translateY(-2px); transition-delay: 0.06s; }
-.project:hover .project-tags span:nth-child(4) { transform: translateY(-2px); transition-delay: 0.09s; }
-
-.project-hint {
-  margin-top: 14px;
-  font-size: 12px;
-  color: var(--text-faint);
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
+.project-hint { margin-top: 14px; font-size: 12px; color: var(--text-faint); opacity: 0; transform: translateY(-4px); transition: opacity 0.2s ease, transform 0.2s ease; }
 .project:hover .project-hint { opacity: 1; transform: translateY(0); }
 
 /* =========================================================
    SKILLS
    ========================================================= */
-.skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px 40px; }
-.skill-group h3 { font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
-.skill-group p { font-size: 14.5px; color: var(--text-dim); }
+/* =========================================================
+   SKILLS — cards, not a text block. Items stay visible at rest
+   (nothing here is hidden-until-hover — that would hurt anyone
+   skimming without a mouse); hover adds a staggered nudge and
+   an accent highlight on top of content that was already there.
+   ========================================================= */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px;
+}
+
+.skill-card {
+  background: linear-gradient(160deg, var(--bg-card), var(--bg-elevated));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 20px;
+  transition: transform 0.3s var(--ease), border-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.skill-card:hover {
+  border-color: var(--accent-dim);
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--accent-glow);
+}
+
+.skill-card h3 { font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 14px; letter-spacing: 0.02em; }
+
+.skill-items { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+.skill-items li {
+  font-size: 14px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  transition: transform 0.3s var(--ease), color 0.25s ease;
+  transition-delay: calc(var(--i, 0) * 0.045s);
+}
+
+.skill-card:hover .skill-items li { transform: translateX(4px); color: var(--text); }
+
+.skill-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text-faint);
+  flex-shrink: 0;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+.skill-card:hover .skill-dot { background: var(--accent-dim); }
+.skill-items li:hover .skill-dot { background: var(--accent); transform: scale(1.5); box-shadow: 0 0 8px var(--accent-glow); }
 
 /* =========================================================
    CONTACT
    ========================================================= */
 .contact-heading { position: relative; }
-.contact-heading::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -12px;
-  width: 46px;
-  height: 2px;
-  background: var(--accent);
-}
-
+.contact-heading::after { content: ""; position: absolute; left: 0; bottom: -12px; width: 46px; height: 2px; background: var(--accent); }
 .contact-lead { color: var(--text-dim); max-width: 52ch; font-size: 15px; margin: 24px 0 40px; }
 
 .contact-form { max-width: 440px; display: flex; flex-direction: column; gap: 18px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label { font-size: 13px; color: var(--text-faint); }
-
 .field input, .field textarea {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 10px 12px;
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 14.5px;
-  resize: vertical;
-  transition: border-color 0.2s ease;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px;
+  padding: 10px 12px; color: var(--text); font-family: var(--font-body); font-size: 14.5px;
+  resize: vertical; transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
-.field input:focus, .field textarea:focus { outline: none; border-color: var(--accent-dim); }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--accent-dim); box-shadow: 0 0 0 3px var(--accent-glow); }
 
 .submit-btn {
-  align-self: flex-start;
-  background: var(--accent);
-  color: #0a0a0a;
-  border: none;
-  border-radius: 4px;
-  padding: 12px 26px;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: var(--font-body);
-  cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.25s ease;
+  align-self: flex-start; background: var(--accent); color: #0a0a0a; border: none; border-radius: 4px;
+  padding: 12px 26px; font-size: 14px; font-weight: 500; font-family: var(--font-body);
+  cursor: pointer; transition: opacity 0.2s ease, transform 0.1s ease, box-shadow 0.25s ease;
 }
-
 .submit-btn:hover { opacity: 0.92; box-shadow: 0 0 0 6px var(--accent-glow); }
-.submit-btn:active { transform: scale(0.97); }
+.submit-btn:active { transform: scale(0.96); }
 
 .form-note { font-size: 13px; color: var(--text-dim); min-height: 18px; }
 
 .contact-links { margin-top: 48px; display: flex; flex-wrap: wrap; gap: 10px 22px; }
-.contact-links a { font-size: 13.5px; color: var(--text-faint); border-bottom: 1px solid transparent; transition: color 0.2s ease, border-color 0.2s ease; }
-.contact-links a:hover { color: var(--accent); border-color: var(--accent-dim); }
+.contact-links a { font-size: 13.5px; color: var(--text-faint); transition: color 0.2s ease; }
+.contact-links a:hover { color: var(--accent); }
 
 /* =========================================================
    FOOTER
@@ -399,127 +580,89 @@ main { margin-left: var(--sidebar-w); max-width: 760px; position: relative; z-in
 kbd { font-family: var(--font-mono); font-size: 11px; border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; }
 
 /* =========================================================
-   SCROLL REVEAL (fallback if GSAP fails to load)
+   SCROLL REVEAL
+   Content is visible by DEFAULT. The CSS transition below only
+   applies to the .scroll-fallback class, which JS adds ONLY when
+   GSAP isn't available — when GSAP IS driving these same
+   properties via inline styles every scroll frame, a CSS
+   transition sitting on top of that fights it and blunts the
+   motion, so the GSAP path never gets this class at all.
    ========================================================= */
-.section, .hero { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.scroll-fallback { transition: opacity 0.6s ease, transform 0.6s ease; }
+.section.prep-hidden, .hero.prep-hidden { opacity: 0; transform: translateY(14px); }
 .section.in-view, .hero.in-view { opacity: 1; transform: translateY(0); }
 
 /* =========================================================
    CURSOR DOT
    ========================================================= */
 .cursor-dot {
-  position: fixed;
-  top: 0; left: 0;
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--accent);
-  pointer-events: none;
-  z-index: 1000;
-  opacity: 0;
-  transition: opacity 0.2s ease, transform 0.15s ease;
-  transform: translate(-50%, -50%);
+  position: fixed; top: 0; left: 0; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); pointer-events: none; z-index: 1000; opacity: 0;
+  transition: opacity 0.2s ease, transform 0.15s ease; transform: translate(-50%, -50%);
 }
-
 .cursor-dot.visible { opacity: 0.7; }
 .cursor-dot.hovering { transform: translate(-50%, -50%) scale(2.4); opacity: 0.35; }
 
 /* =========================================================
-   MODAL — project detail
+   MODAL
    ========================================================= */
 .modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(6, 6, 5, 0.72);
-  backdrop-filter: blur(6px);
-  z-index: 1500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  position: fixed; inset: 0; background: rgba(6, 6, 5, 0.72); backdrop-filter: blur(6px);
+  z-index: 1500; display: flex; align-items: center; justify-content: center; padding: 24px;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
 }
-
 .modal-backdrop.open { opacity: 1; pointer-events: auto; }
 
 .modal {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  max-width: 560px;
-  width: 100%;
-  max-height: 84vh;
-  overflow-y: auto;
-  padding: 40px;
+  background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px;
+  max-width: 560px; width: 100%; max-height: 84vh; overflow-y: auto; padding: 0 40px 40px;
   position: relative;
-  transform: translateY(18px) scale(0.98);
-  opacity: 0;
-  transition: transform 0.35s var(--ease), opacity 0.3s ease;
+  transform-origin: top center;
 }
 
-.modal-backdrop.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+/* Only used when GSAP isn't available — script.js adds this class
+   itself in that case. When GSAP IS driving the open animation, no
+   CSS transition exists on .modal at all, so the two never fight
+   over the same frames. */
+.modal.fallback-anim { transition: transform 0.3s var(--ease), opacity 0.25s ease; transform: scale(0.96); opacity: 0; }
+.modal-backdrop.open .modal.fallback-anim { transform: scale(1); opacity: 1; }
+
+.modal-preview {
+  height: 140px;
+  margin: 0 -40px 28px;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated) 60%, var(--accent-glow));
+  position: relative;
+  overflow: hidden;
+}
+.modal-preview::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+}
 
 .modal-close {
-  position: absolute;
-  top: 18px; right: 18px;
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  font-size: 16px;
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  position: absolute; top: 18px; right: 18px; background: rgba(10,10,10,0.4); border: 1px solid var(--border);
+  color: var(--text-dim); width: 30px; height: 30px; border-radius: 50%; font-size: 16px; cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease; z-index: 2;
 }
-
 .modal-close:hover { color: var(--accent); border-color: var(--accent-dim); }
 
 .modal-tag { font-family: var(--font-mono); font-size: 11.5px; color: var(--accent); margin-bottom: 8px; }
-
 #modal-title { font-family: var(--font-display); font-size: 28px; font-weight: 500; margin-bottom: 16px; }
-
 .modal-desc { color: var(--text-dim); font-size: 14.5px; margin-bottom: 20px; }
 
 .modal-highlights { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-
-.modal-highlights li {
-  font-size: 14px;
-  color: var(--text);
-  padding-left: 16px;
-  position: relative;
-}
-
-.modal-highlights li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 8px;
-  width: 5px; height: 1px;
-  background: var(--accent);
-}
+.modal-highlights li { font-size: 14px; color: var(--text); padding-left: 16px; position: relative; }
+.modal-highlights li::before { content: ""; position: absolute; left: 0; top: 8px; width: 5px; height: 1px; background: var(--accent); }
 
 .modal-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
-
-.modal-tags span {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-faint);
-  border: 1px solid var(--border);
-  padding: 4px 9px;
-  border-radius: 3px;
-}
+.modal-tags span { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); border: 1px solid var(--border); padding: 4px 9px; border-radius: 3px; }
 
 .modal-links { display: flex; gap: 14px; }
-
-.modal-links a {
-  font-size: 13.5px;
-  padding: 9px 18px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
-}
-
+.modal-links a { font-size: 13.5px; padding: 9px 18px; border: 1px solid var(--border); border-radius: 5px; transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease; }
 .modal-links a.primary { background: var(--accent); color: #0a0a0a; border-color: var(--accent); }
 .modal-links a.primary:hover { opacity: 0.9; }
 .modal-links a:not(.primary):hover { border-color: var(--accent-dim); color: var(--accent); }
@@ -530,19 +673,14 @@ body.modal-locked { overflow: hidden; }
    FOCUS STATES
    ========================================================= */
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--accent); outline-offset: 2px;
 }
 
 /* =========================================================
    RESPONSIVE
    ========================================================= */
 @media (max-width: 860px) {
-  .sidebar {
-    position: static; width: 100%; height: auto;
-    flex-direction: row; align-items: center; justify-content: space-between;
-    padding: 18px 20px; border-right: none; border-bottom: 1px solid var(--border);
-  }
+  .sidebar { position: static; width: 100%; height: auto; flex-direction: row; align-items: center; justify-content: space-between; padding: 18px 20px; border-right: none; border-bottom: 1px solid var(--border); }
   .sidebar-top { display: flex; align-items: center; gap: 14px; }
   .role-tag { display: none; }
   .side-nav ul { flex-direction: row; gap: 20px; }
@@ -555,7 +693,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   .skills-grid { grid-template-columns: 1fr; }
   .footer { padding: 28px 24px 48px; }
   .cursor-dot, .spotlight { display: none; }
-  .modal { padding: 28px; }
+  .modal { padding: 0 24px 28px; }
+  .modal-preview { margin: 0 -24px 24px; }
+  .back-to-top { right: 16px; bottom: 16px; }
 }
 
 @media (max-width: 420px) {
