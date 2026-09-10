@@ -14,22 +14,27 @@
 </head>
 <body>
 
+<!-- If JS is blocked or fails entirely, this is what's left — real
+     content, not a blank dark screen. Everything below is also
+     the fallback for renderPersonal(): the HTML already holds the
+     correct static text, and JS enhances it (splits it into
+     animated spans) rather than being the only thing that writes it. -->
+<noscript>
+  <style>.sidebar, .spotlight, .cursor-dot, .loader, #progress-ring, #back-to-top { display: none !important; } main { margin-left: 0 !important; max-width: 720px !important; padding: 40px; }</style>
+</noscript>
+
 <div class="noise" aria-hidden="true"></div>
 
-<!-- Brief load sequence — skipped instantly if the OS says reduce motion.
-     Not a spinner, just the wordmark settling before the page reveals. -->
 <div class="loader" id="loader" aria-hidden="true">
   <span class="loader-mark">A.</span>
 </div>
 
-<!-- Soft radial glow that trails the pointer. Single div, no canvas,
-     blend-mode does the work. This is the one "wow" flourish. -->
 <div class="spotlight" id="spotlight" aria-hidden="true"></div>
 
 <header class="sidebar">
   <div class="sidebar-top">
     <a href="#top" class="mark magnetic" id="logo-mark">A.</a>
-    <p class="role-tag" id="location-tag"></p>
+    <p class="role-tag" id="location-tag">Bhopal, India</p>
   </div>
 
   <nav class="side-nav" aria-label="Primary">
@@ -42,32 +47,102 @@
     </ul>
   </nav>
 
-  <div class="sidebar-bottom" id="sidebar-links"></div>
+  <div class="sidebar-bottom" id="sidebar-links">
+    <p class="connect-label">Let's connect</p>
+    <a href="#" class="connect-row" data-fill="resume" data-tooltip="Download résumé">
+      <svg class="connect-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      <span class="link-label">Resume</span>
+    </a>
+    <a href="https://github.com/amandevspace" class="connect-row" target="_blank" rel="noopener" data-tooltip="View GitHub">
+      <svg class="connect-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+      <span class="link-label">GitHub</span>
+      <svg class="link-icon ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+    </a>
+    <a href="#" class="connect-row" data-fill="linkedin" data-tooltip="Connect on LinkedIn">
+      <svg class="connect-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+      <span class="link-label">LinkedIn</span>
+    </a>
+    <a href="#" class="connect-row" data-fill="leetcode" data-tooltip="View LeetCode profile">
+      <svg class="connect-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+      <span class="link-label">LeetCode</span>
+    </a>
+  </div>
 </header>
+
+<!-- Scroll progress ring, doubles as the back-to-top control.
+     Appears once you've scrolled past the hero. -->
+<button class="back-to-top" id="back-to-top" aria-label="Back to top">
+  <svg id="progress-ring" viewBox="0 0 40 40" width="40" height="40">
+    <circle class="ring-track" cx="20" cy="20" r="17"></circle>
+    <circle class="ring-fill" id="ring-fill" cx="20" cy="20" r="17"></circle>
+  </svg>
+  <span class="back-to-top-arrow">↑</span>
+</button>
 
 <main id="top">
 
   <section class="hero" id="hero">
     <p class="hero-kicker reveal-word">Hey, I'm</p>
-    <h1 class="hero-name" id="hero-name" aria-label="Aman"></h1>
-    <p class="hero-role reveal-word" id="hero-role"></p>
-    <p class="hero-intro reveal-word" id="hero-intro"></p>
-    <a href="#work" class="hero-cta magnetic reveal-word">See what I've built</a>
+    <h1 class="hero-name" id="hero-name" data-fallback="Aman.">Aman<span class="dot">.</span></h1>
+    <p class="hero-role reveal-word" id="hero-role">Computer Science &amp; Engineering student, class of 2027 —<br>building with the MERN stack and, lately, a lot of RAG pipelines.</p>
+    <p class="hero-intro reveal-word" id="hero-intro">I'm based in Bhopal. Most nights you'll find me deep in a codebase or wiring up something with an LLM in it — I learn best by shipping something that has to actually work, not by reading about it.</p>
+    <a href="#work" class="hero-cta magnetic reveal-word"><span class="link-label">See what I've built</span></a>
   </section>
 
   <section class="section about" id="about">
     <h2 class="section-heading">How I got here</h2>
-    <div class="about-body" id="about-body"></div>
+    <div class="journey" id="journey">
+      <div class="journey-rail" aria-hidden="true"><div class="journey-rail-fill" id="journey-rail-fill"></div></div>
+
+      <div class="journey-step">
+        <span class="journey-node"></span>
+        <p class="journey-index">01</p>
+        <h3 class="journey-title">Copying UI</h3>
+        <p class="journey-body">I started by copying things I liked — <span class="key-phrase">pixel-for-pixel remakes</span> of login screens and glassmorphism UIs, just to understand how they were actually built, mountain-landscape background and all. That habit turned into building fuller systems.</p>
+      </div>
+
+      <div class="journey-step">
+        <span class="journey-node"></span>
+        <p class="journey-index">02</p>
+        <h3 class="journey-title">Building Systems</h3>
+        <p class="journey-body">A sign-language-to-speech platform with a 3D avatar took <span class="key-phrase">three different rendering pipelines</span> before it moved naturally — I went from a flat 2D image-based avatar, to FBX with a Mixamo-retargeted rig, and back to GLB once the camera framing finally behaved. A RAG pipeline needed per-user isolated storage before I'd trust it with someone else's documents. An API monitor exists because <span class="key-phrase">"it works on my machine" isn't a monitoring strategy</span>.</p>
+      </div>
+
+      <div class="journey-step">
+        <span class="journey-node"></span>
+        <p class="journey-index">03</p>
+        <h3 class="journey-title">Real-World Thinking</h3>
+        <p class="journey-body">I care more about whether something holds up under real conditions than how it looks in a screenshot — though by the end I usually end up caring about that too.</p>
+      </div>
+    </div>
   </section>
 
   <section class="section work" id="work">
     <h2 class="section-heading">Things I've built</h2>
-    <div class="projects" id="projects-list"></div>
+    <div class="projects" id="projects-list">
+      <article class="project">
+        <div class="project-head"><h3>VaaniSetu</h3><span class="project-links"><a href="https://github.com/amandevspace" target="_blank" rel="noopener" class="u-line">Code</a></span></div>
+        <p class="project-desc">Sign-language ↔ speech platform — React, Three.js / React Three Fiber, MediaPipe.</p>
+      </article>
+      <article class="project offset">
+        <div class="project-head"><h3>ContextIQ</h3><span class="project-links"><a href="https://github.com/amandevspace" target="_blank" rel="noopener" class="u-line">Code</a></span></div>
+        <p class="project-desc">Custom RAG pipeline on OpenRouter, with per-user isolated storage.</p>
+      </article>
+      <article class="project">
+        <div class="project-head"><h3>ApiVigil</h3><span class="project-links"><a href="https://apivigil.onrender.com" target="_blank" rel="noopener" class="u-line">Live</a></span></div>
+        <p class="project-desc">API failure detection and monitoring tool.</p>
+      </article>
+    </div>
   </section>
 
   <section class="section skills" id="skills">
     <h2 class="section-heading">What I work with</h2>
-    <div class="skills-grid" id="skills-grid"></div>
+    <div class="skills-grid" id="skills-grid">
+      <div class="skill-card"><h3>Frontend</h3><ul class="skill-items"><li><span class="skill-dot"></span>React</li><li><span class="skill-dot"></span>Vite</li><li><span class="skill-dot"></span>Three.js</li><li><span class="skill-dot"></span>Tailwind CSS</li></ul></div>
+      <div class="skill-card"><h3>Backend</h3><ul class="skill-items"><li><span class="skill-dot"></span>Node.js</li><li><span class="skill-dot"></span>Express</li><li><span class="skill-dot"></span>MongoDB</li><li><span class="skill-dot"></span>JWT auth</li></ul></div>
+      <div class="skill-card"><h3>AI / GenAI</h3><ul class="skill-items"><li><span class="skill-dot"></span>RAG pipelines</li><li><span class="skill-dot"></span>OpenRouter</li><li><span class="skill-dot"></span>Gemini API</li></ul></div>
+      <div class="skill-card"><h3>Tools</h3><ul class="skill-items"><li><span class="skill-dot"></span>Git</li><li><span class="skill-dot"></span>GitHub</li><li><span class="skill-dot"></span>Render</li><li><span class="skill-dot"></span>Netlify</li></ul></div>
+    </div>
   </section>
 
   <section class="section contact" id="contact">
@@ -90,11 +165,18 @@
         <label for="message">Message</label>
         <textarea id="message" name="message" rows="4" required></textarea>
       </div>
-      <button type="submit" class="submit-btn magnetic">Send message</button>
+      <button type="submit" class="submit-btn magnetic">
+        <span class="link-label">Send message</span>
+      </button>
       <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
     </form>
 
-    <div class="contact-links" id="contact-links"></div>
+    <div class="contact-links" id="contact-links">
+      <a href="https://github.com/amandevspace" target="_blank" rel="noopener" class="icon-link u-line" data-tooltip="View GitHub">
+        <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        <span class="link-label">GitHub</span>
+      </a>
+    </div>
   </section>
 
   <footer class="footer">
@@ -104,10 +186,10 @@
 
 </main>
 
-<!-- Project detail modal — populated on open, one instance reused -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="modal">
     <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+    <div class="modal-preview" id="modal-preview" aria-hidden="true"></div>
     <p class="modal-tag" id="modal-tag"></p>
     <h3 id="modal-title"></h3>
     <p class="modal-desc" id="modal-detail"></p>
